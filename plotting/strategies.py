@@ -268,4 +268,60 @@ class QuarterCarPerformanceMetricsStrategy(PerformanceMetricsStrategy):
 
 class SeatAddedQuarterCarPerformanceMetricsStrategy(PerformanceMetricsStrategy):
     def calculate_performance_metrics(self, analysis_data):
-        pass
+        """
+        Calculates and displays performance metrics for seat-added quarter car simulation.
+
+        Args:
+            analysis_data (dict): Dictionary containing simulation results and metadata.
+        """
+        name = analysis_data["name"]
+        execution_date = analysis_data["execution_date"]
+
+        time_data = np.array(analysis_data['results']['t'])
+        y_data = np.array(analysis_data['results']['y'])
+
+        # Extract data
+        z_seat_data = y_data[0]  # seat displacement
+        z_seat_dot_data = y_data[1]  # seat velocity
+        z_s_data = y_data[2]  # sprung mass displacement
+        z_s_dot_data = y_data[3]  # sprung mass velocity
+        z_u_data = y_data[4]  # unsprung mass displacement
+        z_u_dot_data = y_data[5]  # unsprung mass velocity
+
+        # Calculate accelerations
+        z_seat_ddot_data = np.gradient(z_seat_dot_data, time_data) # seat acceleration
+        z_s_ddot_data = np.gradient(z_s_dot_data, time_data) # sprung mass acceleration
+        z_u_ddot_data = np.gradient(z_u_dot_data, time_data) # unsprung mass acceleration
+
+        # Calculate RMS accelerations
+        rms_acc_seat = np.sqrt(np.mean(z_seat_ddot_data**2)) # seat RMS acceleration
+        rms_acc_ms = np.sqrt(np.mean(z_s_ddot_data**2)) # sprung mass RMS acceleration
+
+        # Get significant figures from configuration
+        sig_figs = configuration.TABLE_STYLE['significant_figures']
+        
+        print("\n" + "="*60)
+        print(f" Performance Metrics for {name}")
+        print(f" {execution_date}")
+        print("="*60)
+        
+        print("\nSeat Metrics:")
+        print("-"*30)
+        print(f"{'Displacement (max):':<20} {max(abs(z_seat_data)):>.{sig_figs['displacement']}f} m")
+        print(f"{'Velocity (max):':<20} {max(abs(z_seat_dot_data)):>.{sig_figs['velocity']}f} m/s")
+        print(f"{'Acceleration (max):':<20} {max(abs(z_seat_ddot_data)):>.{sig_figs['acceleration']}f} m/s²")
+        print(f"{'RMS Acceleration:':<20} {rms_acc_seat:>.{sig_figs['acceleration']}f} m/s²")
+        
+        print("\nSprung Mass Metrics:")
+        print("-"*30)
+        print(f"{'Displacement (max):':<20} {max(abs(z_s_data)):>.{sig_figs['displacement']}f} m")
+        print(f"{'Velocity (max):':<20} {max(abs(z_s_dot_data)):>.{sig_figs['velocity']}f} m/s")
+        print(f"{'Acceleration (max):':<20} {max(abs(z_s_ddot_data)):>.{sig_figs['acceleration']}f} m/s²")
+        print(f"{'RMS Acceleration:':<20} {rms_acc_ms:>.{sig_figs['acceleration']}f} m/s²")
+        
+        print("\nUnsprung Mass Metrics:")
+        print("-"*30)
+        print(f"{'Displacement (max):':<20} {max(abs(z_u_data)):>.{sig_figs['displacement']}f} m")
+        print(f"{'Velocity (max):':<20} {max(abs(z_u_dot_data)):>.{sig_figs['velocity']}f} m/s")
+        print(f"{'Acceleration (max):':<20} {max(abs(z_u_ddot_data)):>.{sig_figs['acceleration']}f} m/s²")
+        print("\n")
