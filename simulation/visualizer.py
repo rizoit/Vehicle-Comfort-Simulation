@@ -49,14 +49,10 @@ class ResultsVisualization:
         model_type = self.analysis_data['vehicle_model']['type']
         if model_type == 'QuarterCarModel':
             return QuarterCarPerformanceMetricsStrategy()
-        else:
-            raise ValueError("Unsupported vehicle model for performance metrics calculation")
         if model_type == 'SeatAddedQuarterCarModel':
             return SeatAddedQuarterCarPerformanceMetricsStrategy()
-        else:
-            raise ValueError("Unsupported vehicle model for performance metrics calculation")
         if model_type == 'HalfCarModel':
-            return HalfCarPerformanceMetricsStrategy()
+            return HalfCarPlottingStrategy()
         else:
             raise ValueError("Unsupported vehicle model for performance metrics calculation")
     

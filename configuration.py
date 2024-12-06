@@ -36,7 +36,7 @@ PLOT_STYLE = {
     'axis_label_size': 11,
     'line_width': 2,
     'marker_size': 6,
-    'colors': ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6'],
+    'colors': ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#34495e', '#e67e22', '#95a5a6', '#c0392b'],
     'grid_style': {
         'color': '#d3d3d3',
         'linestyle': '--',

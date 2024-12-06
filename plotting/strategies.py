@@ -16,6 +16,7 @@ class QuarterCarOutouts():
 
     rms_acc_ms: float = 0.0
     disp_range: float = 0.0
+
  
 class PlottingStrategy(ABC):
     @abstractmethod
@@ -42,14 +43,14 @@ class QuarterCarPlottingStrategy(PlottingStrategy):
         y_data = np.array(analysis_data['results']['y'])
         road_profile = np.array(analysis_data['results']['road_profile'])
 
-        z_s_data = y_data[0]
-        z_s_dot_data = y_data[1]
-        z_u_data = y_data[2]
-        z_u_dot_data = y_data[3]
+        z_s_data = y_data[0]#sprung mass displacement
+        z_s_dot_data = y_data[1]#sprung mass velocity
+        z_u_data = y_data[2]#unsprung mass displacement
+        z_u_dot_data = y_data[3]#unsprung mass velocity
 
         # Calculate accelerations
-        z_s_ddot_data = np.gradient(z_s_dot_data, time_data)
-        z_u_ddot_data = np.gradient(z_u_dot_data, time_data)
+        z_s_ddot_data = np.gradient(z_s_dot_data, time_data)#sprung mass acceleration
+        z_u_ddot_data = np.gradient(z_u_dot_data, time_data)#unsprung mass acceleration
 
         # Create two subplots with configured figure size
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=configuration.PLOT_STYLE['figure_size'])
@@ -102,30 +103,68 @@ class SeatAddedQuarterCarPlottingStrategy(PlottingStrategy):
         
         time_data = np.array(analysis_data['results']['t'])
         y_data = np.array(analysis_data['results']['y'])
+        road_profile = np.array(analysis_data['results']['road_profile'])
 
-        z_seat_data = y_data[0]
-        z_s_data = y_data[2]
-        z_u_data = y_data[4]
+        # Extract displacement data
+        z_seat_data = y_data[0]  # seat displacement
+        z_seat_dot_data = y_data[1]  # seat velocity
+        z_s_data = y_data[2]  # sprung mass displacement
+        z_s_dot_data = y_data[3]  # sprung mass velocity
+        z_u_data = y_data[4]  # unsprung mass displacement
+        z_u_dot_data = y_data[5]  # unsprung mass velocity
 
-        plt.figure(figsize=configuration.PLOT_STYLE['figure_size'])
-        plt.plot(time_data, z_seat_data, label="Seat displacement",
+        # Calculate accelerations using velocity gradients
+        z_seat_ddot_data = np.gradient(z_seat_dot_data, time_data)  # seat acceleration
+        z_s_ddot_data = np.gradient(z_s_dot_data, time_data)  # sprung mass acceleration
+        z_u_ddot_data = np.gradient(z_u_dot_data, time_data)  # unsprung mass acceleration
+
+        # Create two subplots
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=configuration.PLOT_STYLE['figure_size'])
+
+        # First subplot: Accelerations
+        ax1.plot(time_data, z_seat_ddot_data, label="Seat acceleration",
                 linewidth=configuration.PLOT_STYLE['line_width'],
                 color=configuration.PLOT_STYLE['colors'][0])
-        plt.plot(time_data, z_s_data, label="Sprung mass displacement",
+        ax1.plot(time_data, z_s_ddot_data, label="Sprung mass acceleration",
                 linewidth=configuration.PLOT_STYLE['line_width'],
                 color=configuration.PLOT_STYLE['colors'][1])
-        plt.plot(time_data, z_u_data, label="Unsprung mass displacement",
+        ax1.plot(time_data, z_u_ddot_data, label="Unsprung mass acceleration",
                 linewidth=configuration.PLOT_STYLE['line_width'],
                 color=configuration.PLOT_STYLE['colors'][2])
         
-        plt.title("Seat-Added Quarter Car Simulation Results",
-                 fontsize=configuration.PLOT_STYLE['title_size'],
-                 fontweight=configuration.PLOT_STYLE['title_weight'])
-        plt.xlabel("Time [s]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
-        plt.ylabel("Displacement [m]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
-        plt.legend(fontsize=configuration.PLOT_STYLE['legend_font_size'],
+        ax1.set_title("Seat-Added Quarter Car Simulation Results - Accelerations",
+                     fontsize=configuration.PLOT_STYLE['title_size'],
+                     fontweight=configuration.PLOT_STYLE['title_weight'])
+        ax1.set_xlabel("Time [s]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
+        ax1.set_ylabel("Acceleration [m/s²]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
+        ax1.legend(fontsize=configuration.PLOT_STYLE['legend_font_size'],
                   loc=configuration.PLOT_STYLE['legend_location'])
-        plt.grid(True, linewidth=configuration.PLOT_STYLE['grid_style'].get('linewidth', 1))
+        ax1.grid(True, linewidth=configuration.PLOT_STYLE['grid_style'].get('linewidth', 1))
+
+        # Second subplot: Displacements
+        ax2.plot(time_data, road_profile, label="Road profile",
+                linewidth=configuration.PLOT_STYLE['line_width'],
+                color=configuration.PLOT_STYLE['colors'][3])
+        ax2.plot(time_data, z_seat_data, label="Seat displacement",
+                linewidth=configuration.PLOT_STYLE['line_width'],
+                color=configuration.PLOT_STYLE['colors'][4])
+        ax2.plot(time_data, z_s_data, label="Sprung mass displacement",
+                linewidth=configuration.PLOT_STYLE['line_width'],
+                color=configuration.PLOT_STYLE['colors'][5])
+        ax2.plot(time_data, z_u_data, label="Unsprung mass displacement",
+                linewidth=configuration.PLOT_STYLE['line_width'],
+                color=configuration.PLOT_STYLE['colors'][6])
+        
+        ax2.set_title("Seat-Added Quarter Car Simulation Results - Displacements",
+                     fontsize=configuration.PLOT_STYLE['title_size'],
+                     fontweight=configuration.PLOT_STYLE['title_weight'])
+        ax2.set_xlabel("Time [s]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
+        ax2.set_ylabel("Displacement [m]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
+        ax2.legend(fontsize=configuration.PLOT_STYLE['legend_font_size'],
+                  loc=configuration.PLOT_STYLE['legend_location'])
+        ax2.grid(True, linewidth=configuration.PLOT_STYLE['grid_style'].get('linewidth', 1))
+
+        plt.tight_layout()
         plt.show()
 
 class HalfCarPlottingStrategy(PlottingStrategy):
