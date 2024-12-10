@@ -6,6 +6,7 @@ from models import *
 from simulation import *
 from road import *
 from plotting import *
+from matplotlib import pyplot as plt
 
 class VehicleComfortCalculator:
     def __init__(self):
@@ -19,10 +20,17 @@ class VehicleComfortCalculator:
         
         # Create modeling panel
         self.modeling_panel = ModelingPanel(self.main_container)
-        
+    
     def run(self):
         self.root.mainloop()
 
+
+
 if __name__ == "__main__":
-    from example.thesis_work import test
-    test()
+    from example.tested_examples import seat_added_quarter_car
+    seat_added_quarter_car()
+
+
+    
+
+    
