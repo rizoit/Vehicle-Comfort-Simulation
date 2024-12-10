@@ -33,7 +33,10 @@ class SimulationControl:
             self.t_span,
             self.vehicle_model.initial_conditions,
             t_eval=self.t_eval,
-            method='RK45'
+            method='DOP853',
+            max_step=0.01,
+            rtol=1e-8,
+            atol=1e-8
         )
     
         # Add road profile to the results
