@@ -27,8 +27,10 @@ class VehicleComfortCalculator:
 
 
 if __name__ == "__main__":
-    from example.tested_examples import seat_added_quarter_car
+    from example.tested_examples import seat_added_quarter_car,quarter_car
+    #quarter_car()
     seat_added_quarter_car()
+
 
 
     

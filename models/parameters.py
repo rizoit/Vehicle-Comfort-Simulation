@@ -71,14 +71,15 @@ class HalfCarModelParams:
     I   : float = 1000   # Mass moment of inertia [kg⋅m²]
     mu_f: float = 25     # Front unsprung mass [kg]
     ks_f: float = 10000  # Front sprung stiffness [N/m]
-    cs_f: float = 500    # Front sprung damping [Ns/m]
+    cs_f: float = 1000    # Front sprung damping [Ns/m]
     ku_f: float = 75000  # Front unsprung stiffness [N/m]
     mu_r: float = 25     # Rear unsprung mass [kg]
     ks_r: float = 10000  # Rear sprung stiffness [N/m]
-    cs_r: float = 500    # Rear sprung damping [Ns/m]
-    ku_r: float = 75000  # Rear unsprung stiffness [N/m]
+    cs_r: float = 1000    # Rear sprung damping [Ns/m]
+    ku_r: float = 70000  # Rear unsprung stiffness [N/m]
     a   : float = 0.5    # Front distance [m]
     b   : float = 0.5    # Rear distance [m]
+    longitudial_velocity : float = 12 # Longitudinal velocity [m/s]
 
 @dataclass
 class HalfCarModelInitialConditions:
