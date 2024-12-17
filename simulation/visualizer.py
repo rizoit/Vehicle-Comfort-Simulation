@@ -1,6 +1,6 @@
 from plotting.strategies import QuarterCarPlottingStrategy, SeatAddedQuarterCarPlottingStrategy, HalfCarPlottingStrategy
 import numpy as np
-from plotting.strategies import QuarterCarPerformanceMetricsStrategy, SeatAddedQuarterCarPerformanceMetricsStrategy
+from plotting.strategies import QuarterCarPerformanceMetricsStrategy, SeatAddedQuarterCarPerformanceMetricsStrategy, HalfCarPerformanceMetricsStrategy
 
 class ResultsVisualization:
     """Class for visualizing simulation results using different plotting strategies."""
@@ -52,7 +52,7 @@ class ResultsVisualization:
         if model_type == 'SeatAddedQuarterCarModel':
             return SeatAddedQuarterCarPerformanceMetricsStrategy()
         if model_type == 'HalfCarModel':
-            return HalfCarPlottingStrategy()
+            return HalfCarPerformanceMetricsStrategy()
         else:
             raise ValueError("Unsupported vehicle model for performance metrics calculation")
     

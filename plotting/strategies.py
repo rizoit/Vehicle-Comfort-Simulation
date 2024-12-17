@@ -37,6 +37,28 @@ class SeatAddedQuarterCarOutouts():
     rms_acc_seat: float = 0.0
     disp_range_seat: float = 0.0
 
+@dataclass
+class HalfCarOutouts():
+    acc_ms_max: float = 0.0 # Sprung mass acceleration max
+    vel_ms_max: float = 0.0 # Sprung mass velocity max
+    disp_ms_max: float = 0.0 # Sprung mass displacement max
+
+    disp_pitch_max:float = 0.0 #Sprung mass angular displacement
+    vel_pitch_max:float = 0.0 #Sprung mass angular velocity
+    acc_pitch_max:float = 0.0 #Sprung mass angular acceleration
+
+    acc_mu_r_max: float = 0.0 # Rear unsprung mass acceleration max
+    vel_mu_r_max: float = 0.0 # Rear unsprung mass velocity max
+    disp_mu_r_max: float = 0.0 # Rear unsprung mass displacement max
+
+    acc_mu_f_max: float = 0.0 # Front unsprung mass acceleration max
+    vel_mu_f_max: float = 0.0 # Front unsprung mass velocity max
+    disp_mu_f_max: float = 0.0 # Front unsprung mass displacement max
+
+    rms_acc_ms: float = 0.0 #rms value of sprung mass acceleration 
+    rms_acc_pitch: float = 0.0 #rms value of sprung mass pitch acceleration
+    disp_range: float = 0.0 #displacement range of sprung mass
+
 class PlottingStrategy(ABC):
     @abstractmethod
     def plot(self, analysis_data):
@@ -267,7 +289,7 @@ class HalfCarPlottingStrategy(PlottingStrategy):
                 color=configuration.PLOT_STYLE['colors'][3])
 
         # Plot pitch angle on secondary axis
-        ax2_twin.plot(time_data, theta_data, label="Pitch angle",
+        ax2_twin.plot(time_data, theta_data*180/np.pi, label="Pitch angle",
                      linewidth=configuration.PLOT_STYLE['line_width'],
                      color=configuration.PLOT_STYLE['colors'][3],
                      linestyle='--')
@@ -278,7 +300,7 @@ class HalfCarPlottingStrategy(PlottingStrategy):
                      fontweight=configuration.PLOT_STYLE['title_weight'])
         ax2.set_xlabel("Time [s]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
         ax2.set_ylabel("Linear Displacement [m]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
-        ax2_twin.set_ylabel("Pitch Angle [rad]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
+        ax2_twin.set_ylabel("Pitch Angle [degree]", fontsize=configuration.PLOT_STYLE['axis_label_size'])
 
         # Combine legends from both axes
         lines1, labels1 = ax2.get_legend_handles_labels()
@@ -360,10 +382,6 @@ class QuarterCarPerformanceMetricsStrategy(PerformanceMetricsStrategy):
         print(f"{'Acceleration (max):':<20} {self.params.acc_mu_max:>.{sig_figs['acceleration']}f} m/s²")
         print("\n")
 
-
-
-
-
 class SeatAddedQuarterCarPerformanceMetricsStrategy(PerformanceMetricsStrategy):
     def __init__(self, params=SeatAddedQuarterCarOutouts()):
         self.params = params
@@ -443,13 +461,102 @@ class SeatAddedQuarterCarPerformanceMetricsStrategy(PerformanceMetricsStrategy):
         print(f"{'Acceleration (max):':<20} {self.params.acc_mu_max:>.{sig_figs['acceleration']}f} m/s²")
         print("\n")
 
-        print("********************************************************")
-        print(f"'max_sprung_acceleration': {self.params.acc_ms_max},")
-        print(f"'max_unsprung_acceleration': {self.params.acc_mu_max},")
-        print(f"'max_sprung_displacement': {self.params.disp_ms_max},")
-        print(f"'max_unsprung_displacement': {self.params.disp_mu_max},")
-        print(f"'max_sprung_velocity': {self.params.vel_ms_max},")
-        print(f"'max_unsprung_velocity': {self.params.vel_mu_max},")
-        print(f"'displacement_range_ms': {self.params.disp_range_ms}")
-        print(f"'displacement_range_seat': {self.params.disp_range_seat}")
-        print("********************************************************")
+class HalfCarPerformanceMetricsStrategy(PerformanceMetricsStrategy):
+    def __init__(self, params=HalfCarOutouts()):
+        self.params = params
+
+    def calculate_performance_metrics(self, analysis_data):
+        """
+        Calculates and displays performance metrics for half car simulation.
+
+        Args:
+            analysis_data (dict): Dictionary containing simulation results and metadata.
+
+        Updates:
+            self.params: Updates the HalfCarOutouts dataclass with calculated metrics.
+        """
+        name = analysis_data["name"]
+        execution_date = analysis_data["execution_date"]
+
+        time_data = np.array(analysis_data['results']['t'])
+        y_data = np.array(analysis_data['results']['y'])
+
+
+
+        # Extract data
+        z_s_data = y_data[0]  # sprung mass displacement
+        z_s_dot_data = y_data[1]  # sprung mass velocity
+        pitch_data = y_data[2]  # pitch angle
+        pitch_dot_data = y_data[3]  # pitch angular velocity
+        z_u_f_data = y_data[4]  # front unsprung displacement
+        z_u_f_dot_data = y_data[5]  # front unsprung velocity
+        z_u_r_data = y_data[6]  # rear unsprung displacement
+        z_u_r_dot_data = y_data[7]  # rear unsprung velocity
+
+        # Calculate accelerations
+        z_s_ddot_data = np.gradient(z_s_dot_data, time_data)  # sprung mass acceleration
+        z_u_f_ddot_data = np.gradient(z_u_f_dot_data, time_data)  # front unsprung acceleration
+        z_u_r_ddot_data = np.gradient(z_u_r_dot_data, time_data)  # rear unsprung acceleration
+        pitch_ddot_data = np.gradient(pitch_dot_data, time_data)  # pitch angular acceleration
+
+        # Update params with calculated metrics
+        self.params.acc_ms_max = max(abs(z_s_ddot_data))
+        self.params.vel_ms_max = max(abs(z_s_dot_data))
+        self.params.disp_ms_max = max(abs(z_s_data))
+        self.params.acc_mu_f_max = max(abs(z_u_f_ddot_data))
+        self.params.acc_mu_r_max = max(abs(z_u_r_ddot_data))
+        self.params.disp_pitch_max = max(abs(pitch_data*180/np.pi))
+        self.params.vel_pitch_max = max(abs(pitch_dot_data))
+        self.params.acc_pitch_max = max(abs(pitch_ddot_data))
+        
+        self.params.vel_mu_f_max = max(abs(z_u_f_dot_data))
+        self.params.vel_mu_r_max = max(abs(z_u_r_dot_data))
+
+        self.params.vel_mu_f_max = max(abs(z_u_f_dot_data))
+        self.params.vel_mu_r_max = max(abs(z_u_r_dot_data))
+        
+        self.params.disp_mu_f_max = max(abs(z_u_f_data))
+        self.params.disp_mu_r_max = max(abs(z_u_r_data))
+
+
+        self.params.rms_acc_ms = np.sqrt(np.mean(z_s_ddot_data**2))
+        self.params.rms_acc_pitch = np.sqrt(np.mean(pitch_ddot_data**2))
+        
+        self.params.disp_range = np.ptp(z_s_data)
+
+        # Get significant figures from configuration
+        sig_figs = configuration.TABLE_STYLE['significant_figures']
+        
+        print("\n" + "="*60)
+        print(f" Performance Metrics for {name}")
+        print(f" {execution_date}")
+        print("="*60)
+        
+        print("\nSprung Mass Metrics:")
+        print("-"*30)
+        print(f"{'Displacement (max):':<20} {self.params.disp_ms_max:>.{sig_figs['displacement']}f} m")
+        print(f"{'Velocity (max):':<20} {self.params.vel_ms_max:>.{sig_figs['velocity']}f} m/s")
+        print(f"{'Acceleration (max):':<20} {self.params.acc_ms_max:>.{sig_figs['acceleration']}f} m/s²")
+        print(f"{'RMS Acceleration:':<20} {self.params.rms_acc_ms:>.{sig_figs['acceleration']}f} m/s²")
+        print(f"{'Displacement Range:':<20} {self.params.disp_range:>.{sig_figs['displacement']}f} m")
+        print("- -"*10)
+        print(f"{'Pitch Angle (max):':<20} {self.params.disp_pitch_max:>.{sig_figs['displacement']}f} Deg")
+        print(f"{'Velocity (max):':<20} {self.params.vel_pitch_max:>.{sig_figs['velocity']}f} rad/s")
+        print(f"{'Acceleration (max):':<20} {self.params.acc_pitch_max:>.{sig_figs['acceleration']}f} rad/s²")
+        print(f"{'RMS Acceleration:':<20} {self.params.rms_acc_pitch:>.{sig_figs['acceleration']}f} m/s²")
+        
+        
+        print("\nUnsprung Mass Metrics:")
+        print("-"*30)
+        print(f"{'Front Displacement (max):':<25} {self.params.disp_mu_f_max:>.{sig_figs['displacement']}f} m")
+        print(f"{'Front Velocity (max):':<25} {self.params.vel_mu_f_max:>.{sig_figs['velocity']}f} m/s")
+        print(f"{'Front Acceleration (max):':<25} {self.params.acc_mu_f_max:>.{sig_figs['acceleration']}f} m/s²")
+        print("- -"*10)
+        print(f"{'Rear Displacement (max):':<25} {self.params.disp_mu_r_max:>.{sig_figs['displacement']}f} m")
+        print(f"{'Rear Velocity (max):':<25} {self.params.vel_mu_r_max:>.{sig_figs['velocity']}f} m/s")
+        print(f"{'Rear Acceleration (max):':<25} {self.params.acc_mu_r_max:>.{sig_figs['acceleration']}f} m/s²")
+        print("\n")
+
+
+
+
