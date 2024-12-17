@@ -40,23 +40,36 @@ class HalfCarModel(VehicleModel):
         mu_f, mu_r = self.params['mu_f'], self.params['mu_r']
         ks_f, ks_r = self.params['ks_f'], self.params['ks_r']
         cs_f, cs_r = self.params['cs_f'], self.params['cs_r']
-        kt_f, kt_r = self.params['kt_f'], self.params['kt_r']
+        ku_f, ku_r = self.params['ku_f'], self.params['ku_r']
         a, b = self.params['a'], self.params['b']
+        longitudinal_velocity = self.params['longitudial_velocity']
         
-        # Road inputs
-        z_r_f, z_r_r = u(t)
+    
+        x_s, x_s_dot, theta, theta_dot, x_u_f, x_u_f_dot, x_u_r, x_u_r_dot = y
+        
         
         # Calculate forces
-        F_s_f = ks_f * (z_s - z_u_f + a * theta) + cs_f * (z_s_dot - z_u_f_dot + a * theta_dot)
-        F_s_r = ks_r * (z_s - z_u_r - b * theta) + cs_r * (z_s_dot - z_u_r_dot - b * theta_dot)
-        F_t_f = kt_f * (z_u_f - z_r_f)
-        F_t_r = kt_r * (z_u_r - z_r_r)
-        
-        # Calculate accelerations
-        z_s_ddot = (-F_s_f - F_s_r) / ms
-        theta_ddot = (a * F_s_f - b * F_s_r) / I
-        z_u_f_ddot = (F_s_f - F_t_f) / mu_f
-        z_u_r_ddot = (F_s_r - F_t_r) / mu_r
-        
-        return np.array([z_s_dot, z_s_ddot, theta_dot, theta_ddot, z_u_f_dot, z_u_f_ddot, z_u_r_dot, z_u_r_ddot])
+        x_g_f = u(t)
 
+        delay_between_tires = (a + b)/longitudinal_velocity
+
+        if t<delay_between_tires:
+            x_g_r = 0
+        else:
+            x_g_r = u(t-delay_between_tires)
+
+        # Calculate accelerations
+        F_u_r = ku_r*(x_g_r - x_u_r)
+        F_u_f = ku_f*(x_g_f - x_u_f)
+        F_s_r = ks_r*(x_u_r - x_s + b*theta) + cs_r*(x_u_r_dot - x_s_dot + b*theta_dot)
+        F_s_f = ks_f*(x_u_f - x_s - a*theta) + cs_f*(x_u_f_dot - x_s_dot - a*theta_dot)
+        
+
+        # Calculate accelerations
+        x_u_r_ddot = (F_u_r - F_s_r)/mu_r
+        x_u_f_ddot = (F_u_f - F_s_f)/mu_f
+        x_s_ddot = (F_s_r + F_s_f)/ms
+        theta_ddot = (a * F_s_f - b * F_s_r) / I
+        
+        #return np.array([z_s_dot, z_s_ddot, theta_dot, theta_ddot, z_u_f_dot, z_u_f_ddot, z_u_r_dot, z_u_r_ddot])
+        return np.array([x_s_dot, x_s_ddot, theta_dot, theta_ddot, x_u_f_dot, x_u_f_ddot, x_u_r_dot, x_u_r_ddot])
