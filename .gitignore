@@ -46,3 +46,5 @@ seat_added_quarter_car_ThesisWork.json
 notes/notes_private.ipynb
 *.json
 *.json
+*.json
+temp.py

@@ -35,6 +35,7 @@ class SimulationCollector:
             "t_span": simulation_control.t_span,
             "t_eval": simulation_control.t_eval.tolist()
         }
+        
         self.analyses[simulation_control.name] = analysis_data
 
     def get_analysis(self, name):
