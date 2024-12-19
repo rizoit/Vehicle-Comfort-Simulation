@@ -1,10 +1,13 @@
 from scipy.integrate import solve_ivp
 from datetime import datetime
 
+
 class SimulationControl:
     """Class for controlling and running vehicle model simulations."""
 
-    def __init__(self, vehicle_model, road_profile, t_span, t_eval, name="Unnamed Simulation"):
+    def __init__(
+        self, vehicle_model, road_profile, t_span, t_eval, name="Unnamed Simulation"
+    ):
         """
         Initialize the SimulationControl with a vehicle model, road profile, and time settings.
 
@@ -25,24 +28,25 @@ class SimulationControl:
 
     def run_simulation(self):
         """Run the simulation using the specified vehicle model and road profile."""
+
         def ode_wrapper(t, y):
-            return self.vehicle_model.equations_of_motion(y, t, self.road_profile.get_profile)
+            return self.vehicle_model.equations_of_motion(
+                y, t, self.road_profile.get_profile
+            )
 
         self.results = solve_ivp(
             ode_wrapper,
             self.t_span,
             self.vehicle_model.initial_conditions,
             t_eval=self.t_eval,
-            method='DOP853',
+            method="DOP853",
             max_step=0.01,
             rtol=1e-8,
-            atol=1e-8
+            atol=1e-8,
         )
-    
+
         # Add road profile to the results
         self.results.road_profile = self.road_profile.get_profile(self.results.t)
 
         # Update execution date
         self.execution_date = datetime.now().isoformat()
-        
-

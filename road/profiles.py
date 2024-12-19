@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 class RoadProfile:
     """Class representing different types of road profiles."""
 
@@ -24,18 +25,31 @@ class RoadProfile:
 
         Returns:
             float: Road profile displacement at time t.
-        
+
         Raises:
             ValueError: If the road profile type is unsupported.
         """
-        if self.profile_type == 'sinusoidal':
-            return self.params['amplitude'] * np.sin(2 * np.pi * self.params['frequency'] * t)
-        elif self.profile_type == 'step':
-            return self.params['amplitude'] * (t >= self.params['activation_time'])
-        elif self.profile_type == 'chirp':
-            return self.params['amplitude'] * np.sin(2 * np.pi * (self.params['initial_frequency'] + 
-                   (self.params['final_frequency'] - self.params['initial_frequency']) / 
-                   (2 * self.params['end_time']) * t) * t)
+        if self.profile_type == "sinusoidal":
+            return self.params["amplitude"] * np.sin(
+                2 * np.pi * self.params["frequency"] * t
+            )
+        elif self.profile_type == "step":
+            return self.params["amplitude"] * (t >= self.params["activation_time"])
+        elif self.profile_type == "chirp":
+            return self.params["amplitude"] * np.sin(
+                2
+                * np.pi
+                * (
+                    self.params["initial_frequency"]
+                    + (
+                        self.params["final_frequency"]
+                        - self.params["initial_frequency"]
+                    )
+                    / (2 * self.params["end_time"])
+                    * t
+                )
+                * t
+            )
         else:
             raise ValueError("Unsupported road profile type")
 
@@ -53,4 +67,3 @@ class RoadProfile:
         plt.ylabel("Displacement [m]")
         plt.grid(True)
         plt.show()
-

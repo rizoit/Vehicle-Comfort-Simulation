@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 
+
 class VehicleModel(ABC):
     """Abstract base class for vehicle models."""
 
@@ -17,7 +18,7 @@ class VehicleModel(ABC):
 
     def __repr__(self):
         return f"Parameters of this vehicle: {self.params} \n and initial conditions: {self.initial_conditions}"
-    
+
     @abstractmethod
     def equations_of_motion(self, y: np.ndarray, t: float, u: callable) -> np.ndarray:
         """
@@ -32,4 +33,3 @@ class VehicleModel(ABC):
             np.ndarray: Derivatives of the state vector.
         """
         pass
-

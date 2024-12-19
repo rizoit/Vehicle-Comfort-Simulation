@@ -1,2 +1,5 @@
-from .strategies import QuarterCarPlottingStrategy, SeatAddedQuarterCarPlottingStrategy, HalfCarPlottingStrategy
-
+from .strategies import (
+    QuarterCarPlottingStrategy,
+    SeatAddedQuarterCarPlottingStrategy,
+    HalfCarPlottingStrategy,
+)

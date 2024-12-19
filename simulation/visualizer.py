@@ -1,6 +1,15 @@
-from plotting.strategies import QuarterCarPlottingStrategy, SeatAddedQuarterCarPlottingStrategy, HalfCarPlottingStrategy
+from plotting.strategies import (
+    QuarterCarPlottingStrategy,
+    SeatAddedQuarterCarPlottingStrategy,
+    HalfCarPlottingStrategy,
+)
 import numpy as np
-from plotting.strategies import QuarterCarPerformanceMetricsStrategy, SeatAddedQuarterCarPerformanceMetricsStrategy, HalfCarPerformanceMetricsStrategy
+from plotting.strategies import (
+    QuarterCarPerformanceMetricsStrategy,
+    SeatAddedQuarterCarPerformanceMetricsStrategy,
+    HalfCarPerformanceMetricsStrategy,
+)
+
 
 class ResultsVisualization:
     """Class for visualizing simulation results using different plotting strategies."""
@@ -22,16 +31,16 @@ class ResultsVisualization:
 
         Returns:
             PlottingStrategy: An instance of the appropriate plotting strategy.
-        
+
         Raises:
             ValueError: If the vehicle model type is unsupported.
         """
-        model_type = self.analysis_data['vehicle_model']['type']
-        if model_type == 'QuarterCarModel':
+        model_type = self.analysis_data["vehicle_model"]["type"]
+        if model_type == "QuarterCarModel":
             return QuarterCarPlottingStrategy()
-        elif model_type == 'SeatAddedQuarterCarModel':
+        elif model_type == "SeatAddedQuarterCarModel":
             return SeatAddedQuarterCarPlottingStrategy()
-        elif model_type == 'HalfCarModel':
+        elif model_type == "HalfCarModel":
             return HalfCarPlottingStrategy()
         else:
             raise ValueError("Unsupported vehicle model for plotting")
@@ -42,26 +51,28 @@ class ResultsVisualization:
 
         Returns:
             PerformanceMetricsStrategy: An instance of the appropriate performance metrics strategy.
-        
+
         Raises:
             ValueError: If the vehicle model type is unsupported.
         """
-        model_type = self.analysis_data['vehicle_model']['type']
-        if model_type == 'QuarterCarModel':
+        model_type = self.analysis_data["vehicle_model"]["type"]
+        if model_type == "QuarterCarModel":
             return QuarterCarPerformanceMetricsStrategy()
-        if model_type == 'SeatAddedQuarterCarModel':
+        if model_type == "SeatAddedQuarterCarModel":
             return SeatAddedQuarterCarPerformanceMetricsStrategy()
-        if model_type == 'HalfCarModel':
+        if model_type == "HalfCarModel":
             return HalfCarPerformanceMetricsStrategy()
         else:
-            raise ValueError("Unsupported vehicle model for performance metrics calculation")
-    
+            raise ValueError(
+                "Unsupported vehicle model for performance metrics calculation"
+            )
+
     def plot_results(self):
         """Plot the results using the selected plotting strategy."""
         self.plotting_strategy.plot(self.analysis_data)
 
     def calculate_performance_metrics(self):
         """Calculate performance metrics for the simulation results."""
-        self.performance_metric_strategy.calculate_performance_metrics(self.analysis_data)
-        
-
+        self.performance_metric_strategy.calculate_performance_metrics(
+            self.analysis_data
+        )

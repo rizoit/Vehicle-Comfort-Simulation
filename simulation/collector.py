@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+
 class SimulationCollector:
     """Class for collecting and managing simulation analyses."""
 
@@ -17,25 +18,26 @@ class SimulationCollector:
         """
         analysis_data = {
             "name": simulation_control.name,
-            "execution_date": simulation_control.execution_date or datetime.now().isoformat(),
+            "execution_date": simulation_control.execution_date
+            or datetime.now().isoformat(),
             "vehicle_model": {
                 "type": type(simulation_control.vehicle_model).__name__,
                 "params": simulation_control.vehicle_model.params,
-                "initial_conditions": simulation_control.vehicle_model.initial_conditions
+                "initial_conditions": simulation_control.vehicle_model.initial_conditions,
             },
             "road_profile": {
                 "type": simulation_control.road_profile.profile_type,
-                "params": simulation_control.road_profile.params
+                "params": simulation_control.road_profile.params,
             },
             "results": {
                 "t": simulation_control.results.t.tolist(),
                 "y": simulation_control.results.y.tolist(),
-                "road_profile": simulation_control.results.road_profile.tolist()
+                "road_profile": simulation_control.results.road_profile.tolist(),
             },
             "t_span": simulation_control.t_span,
-            "t_eval": simulation_control.t_eval.tolist()
+            "t_eval": simulation_control.t_eval.tolist(),
         }
-        
+
         self.analyses[simulation_control.name] = analysis_data
 
     def get_analysis(self, name):
@@ -66,7 +68,7 @@ class SimulationCollector:
         Args:
             filename (str): The filename to export the results to.
         """
-        with open(filename, 'w') as f:
+        with open(filename, "w") as f:
             json.dump(self.analyses, f, indent=2)
 
     def import_results(self, filename):
@@ -76,9 +78,9 @@ class SimulationCollector:
         Args:
             filename (str): The filename to import results from.
         """
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             data = json.load(f)
-        
+
         for name, analysis in data.items():
             self.analyses[name] = analysis
 
@@ -92,7 +94,11 @@ class SimulationCollector:
         Returns:
             dict: A dictionary of the selected analyses.
         """
-        return {name: self.analyses[name] for name in analysis_names if name in self.analyses}
+        return {
+            name: self.analyses[name]
+            for name in analysis_names
+            if name in self.analyses
+        }
 
     def add_analysis_from_data(self, analysis_data):
         """
@@ -106,7 +112,7 @@ class SimulationCollector:
         """
         if not isinstance(analysis_data, dict) or "name" not in analysis_data:
             raise ValueError("Invalid analysis data format")
-            
+
         self.analyses[analysis_data["name"]] = analysis_data
 
     def get_analyses(self, name=None):
@@ -125,7 +131,6 @@ class SimulationCollector:
             if not self.analyses:
                 return None
             return list(self.analyses.values())[-1]
-        
+
         # Return the specified analysis
         return self.analyses.get(name)
-
